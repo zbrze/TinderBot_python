@@ -18,7 +18,7 @@ class TinderBot():
         self.driver.switch_to_window(self.driver.window_handles[1])
 
         emailInput = self.driver.find_element_by_xpath('//*[@id="email"]')
-        emailInput.send_keys('dianarakoln@gmail.com')
+        emailInput.send_keys('dianaraskoln@gmail.com')
         passwordInput = self.driver.find_element_by_xpath('//*[@id="pass"]')
         passwordInput.send_keys('tinderbot')
         confirmButton = self.driver.find_element_by_xpath('//*[@id="u_0_0"]')
