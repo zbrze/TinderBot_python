@@ -3,9 +3,11 @@ from time import sleep
 
 from loginInfo import email, password
 
+
 class TinderBot():
     def __init__(self):
         self.driver = webdriver.Chrome()
+
 
     def launchTinder(self):
         # uruchomienie aplikacji
@@ -81,9 +83,9 @@ class TinderBot():
         try:
             # proba znalezienia trzeciego zdjecia, jesli nie ma -> swipe left
             self.driver.find_element_by_xpath('//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[1]/div[2]/button[3]')
-            swipeLeftButton.click()
-        except:
             swipeRightButton.click()
+        except:
+            swipeLeftButton.click()
         finally:
             sleep(2)
 
@@ -103,7 +105,6 @@ class TinderBot():
             sleep(3)
             x_button = self.driver.find_element_by_xpath('//a[@href="/app/matches"]')
             x_button.click()
-
 
 
 
