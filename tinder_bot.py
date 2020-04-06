@@ -92,6 +92,18 @@ class TinderBot():
         except:
             pass
         sleep(1)
+        
+    def chatBot(self):
+        messagesButton = self.driver.find_element_by_xpath('//*[@id="messages-tab"]')
+        messagesButton.click()
+        sleep(5)
+        chatWindows = self.driver.find_elements_by_xpath('//*[@id="matchListWithMessages"]')
+        for convo in chatWindows:
+            convo.click()
+            sleep(3)
+            x_button = self.driver.find_element_by_xpath('//a[@href="/app/matches"]')
+            x_button.click()
+
 
 
 
