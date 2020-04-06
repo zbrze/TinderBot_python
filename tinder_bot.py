@@ -98,8 +98,8 @@ class TinderBot():
     def chatBot(self):
         messagesButton = self.driver.find_element_by_xpath('//*[@id="messages-tab"]')
         messagesButton.click()
-        sleep(5)
-        chatWindows = self.driver.find_elements_by_xpath('//*[@id="matchListWithMessages"]')
+        sleep(2)
+        chatWindows = self.driver.find_elements_by_class_name('messageListItem')
         for convo in chatWindows:
             convo.click()
             sleep(3)
