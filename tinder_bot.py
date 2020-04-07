@@ -16,7 +16,9 @@ SESSION_ID = '118197476799899566966'
 
 class TinderBot():
     def __init__(self):
-        self.driver = webdriver.Chrome()
+        options = webdriver.ChromeOptions()
+        options.add_argument("--start-maximized")
+        self.driver = webdriver.Chrome(chrome_options=options)
 
 
     def launchTinder(self):
