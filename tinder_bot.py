@@ -133,7 +133,7 @@ class TinderBot():
                 response = self.chat_bot(last_message_text)
                 input_box = self.driver.find_element_by_class_name('sendMessageForm__input')
                 input_box.send_keys(response)
-                send_button = self.driver.find_element_by_class_name('sendMessageForm__input')
+                send_button = self.driver.find_element_by_xpath('//form/button[@type="submit"]')
                 send_button.click()
             x_button = self.driver.find_element_by_xpath('//a[@href="/app/matches"]')
             x_button.click()
