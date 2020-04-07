@@ -116,14 +116,14 @@ class TinderBot():
         messagesButton = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="messages-tab"]')))
         # messagesButton = self.driver.find_element_by_xpath('//*[@id="messages-tab"]')
         messagesButton.click()
-        # sleep(2)
-        chat_windows = wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'messageListItem')))
-        # chat_windows = self.driver.find_elements_by_class_name('messageListItem')
+        sleep(2)
+        # chat_windows = wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'messageListItem')))
+        chat_windows = self.driver.find_elements_by_class_name('messageListItem')
         for convo in chat_windows:
             convo.click()
-            # sleep(3)
-            all_messages = wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'msg')))
-            # all_messages = self.driver.find_elements_by_class_name('msg')
+            sleep(3)
+            # all_messages = wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'msg')))
+            all_messages = self.driver.find_elements_by_class_name('msg')
             last_message = all_messages[-1]
             #teraz sprawdzamy czy ostatnia wiadomość na czacie została napisana przez nas czy przez parę -
             #wiadomości napisane przez parę mają kolor #000
