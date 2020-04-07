@@ -1,7 +1,8 @@
 from selenium import webdriver
 from time import sleep
-
+import dialogflow
 from loginInfo import email, password
+
 DIALOGFLOW_PROJECT_ID = 'diana-eoqlsq'
 DIALOGFLOW_LANGUAGE_CODE = 'pl'
 GOOGLE_APPLICATION_CREDENTIALS = 'diana-eoqlsq-98249f138627.json'
