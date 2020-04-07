@@ -3,6 +3,10 @@ from time import sleep
 
 from loginInfo import email, password
 
+DIALOGFLOW_PROJECT_ID = 'diana-eoqlsq'
+DIALOGFLOW_LANGUAGE_CODE = 'pl'
+GOOGLE_APPLICATION_CREDENTIALS = 'AIzaSyB95M3TxX*********' #to jest tajne
+SESSION_ID = 'current-user-id'  #właśnie nwm co tu wpisać
 
 class TinderBot():
     def __init__(self):
