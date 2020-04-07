@@ -95,14 +95,38 @@ class TinderBot():
             pass
         sleep(1)
         
-    def chatBot(self):
+     def chat_bot(data, xd):
+        session_client = dialogflow.SessionsClient();
+        session = session_client.session_path(DIALOGFLOW_PROJECT_ID, SESSION_ID)
+        text_input = dialogflow.types.TextInput(text = data, language_code = DIALOGFLOW_LANGUAGE_CODE)
+        query_input = dialogflow.types.QueryInput(text = text_input)
+        response = session_client.detect_intent(session = session, query_input = query_input)
+        if response:
+            return response.query_result.fulfillment_text
+        else:
+            return ':)'
+
+
+    def chat(self):
         messagesButton = self.driver.find_element_by_xpath('//*[@id="messages-tab"]')
         messagesButton.click()
         sleep(2)
-        chatWindows = self.driver.find_elements_by_class_name('messageListItem')
-        for convo in chatWindows:
+        chat_windows = self.driver.find_elements_by_class_name('messageListItem')
+        for convo in chat_windows:
             convo.click()
             sleep(3)
+            all_messages = self.driver.find_elements_by_class_name('msg')
+            last_message = all_messages[-1]
+            #teraz sprawdzamy czy ostatnia wiadomość na czacie została napisana przez nas czy przez parę -
+            #wiadomości napisane przez parę mają kolor #000
+            if "C(#000)" in last_message.get_attribute('class').split():
+                # Message might not have text, just emoji.
+                last_message_text = last_message.find_element_by_xpath(".//span").text
+                response = self.chat_bot(last_message_text)
+                input_box = self.driver.find_element_by_class_name('sendMessageForm__input')
+                input_box.send_keys(response)
+                send_button = self.driver.find_element_by_class_name('sendMessageForm__input')
+                send_button.click()
             x_button = self.driver.find_element_by_xpath('//a[@href="/app/matches"]')
             x_button.click()
 
