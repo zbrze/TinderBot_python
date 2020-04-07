@@ -6,7 +6,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from time import sleep
 import dialogflow
 from loginInfo import email, password
-
 import os
 
 DIALOGFLOW_PROJECT_ID = 'diana-eoqlsq'
