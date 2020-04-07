@@ -7,9 +7,11 @@ from time import sleep
 import dialogflow
 from loginInfo import email, password
 
+import os
+
 DIALOGFLOW_PROJECT_ID = 'diana-eoqlsq'
 DIALOGFLOW_LANGUAGE_CODE = 'pl'
-GOOGLE_APPLICATION_CREDENTIALS = 'diana-eoqlsq-98249f138627.json'
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = './diana-eoqlsq-98249f138627.json'
 SESSION_ID = '118197476799899566966'
 
 
