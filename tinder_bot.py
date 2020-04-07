@@ -102,12 +102,12 @@ class TinderBot():
             pass
         # sleep(1)
         
-    def chat_bot(data, xd):
+    def chat_bot(self, xd):
         session_client = dialogflow.SessionsClient()
         session = session_client.session_path(DIALOGFLOW_PROJECT_ID, SESSION_ID)
-        text_input = dialogflow.types.TextInput(text=xd, language_code = DIALOGFLOW_LANGUAGE_CODE)
+        text_input = dialogflow.types.TextInput(text=xd, language_code=DIALOGFLOW_LANGUAGE_CODE)
         query_input = dialogflow.types.QueryInput(text=text_input)
-        response = session_client.detect_intent(session=session, query_input = query_input)
+        response = session_client.detect_intent(session=session, query_input=query_input)
         if response:
             return response.query_result.fulfillment_text
         else:
