@@ -2,11 +2,11 @@ from selenium import webdriver
 from time import sleep
 
 from loginInfo import email, password
-
 DIALOGFLOW_PROJECT_ID = 'diana-eoqlsq'
 DIALOGFLOW_LANGUAGE_CODE = 'pl'
-GOOGLE_APPLICATION_CREDENTIALS = 'AIzaSyB95M3TxX*********' #to jest tajne
-SESSION_ID = 'current-user-id'  #właśnie nwm co tu wpisać
+GOOGLE_APPLICATION_CREDENTIALS = 'diana-eoqlsq-98249f138627.json'
+SESSION_ID = '118197476799899566966'
+
 
 class TinderBot():
     def __init__(self):
