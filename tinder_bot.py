@@ -37,7 +37,7 @@ class TinderBot():
             moreOptions = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@class='Td(u) Cur(p) Fw($medium) Tt(u)--ml focus-outline-style'][.='Więcej opcji']")))
             moreOptions.click()
         except:
-            pass
+            pass 
 
         try:
             loginByFB = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@class='button Lts($ls-s) Z(0) CenterAlign Mx(a) Pos(r) Cur(p) Tt(u) Bdrs(100px) Px(48px) Px(40px)--s Py(0) Mih(54px) button--outline Bdw(2px) Bds(s) Trsdu($fast) Bdc($c-secondary) C($c-secondary) Bdc($c-base):h C($c-base):h Bdc($c-base):f C($c-base):f Bdc($c-base):a C($c-base):a Fw($semibold) focus-button-style Mb(20px)--ml W(100%)--ml W(100%)--s Fz(4vw)--s'][.='Zaloguj się przez Facebooka']")))
