@@ -148,9 +148,22 @@ class TinderBot():
             if "C(#000)" in last_message.get_attribute('class').split():
                 # Message might not have text, just emoji.
                 last_message_text = last_message.find_element_by_xpath(".//span").text
-                print(last_message_text)
+                print(last_message_text)/main/div[1]/div/div/div[1]/div/div[2]/div[2]/button')))
+        swipeRightButton = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[2]/div[4]/button')))
+
+        # proba znalezienia trzeciego zdjecia, jesli nie ma -> swipe left
+        try:
+            wait.until(EC.element_t
                 print(str(last_message_text))
-                response = self.chat_bot(last_message_text, name_of_gut)
+                response = self.chat_bot(last_message_text, name_of_gut)/main/div[1]/div/div/div[1]/div/div[2]/div[2]/button')))
+        swipeRightButton = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[2]/div[4]/button')))
+
+
+
+#mordo co to tu robi
+        # proba znalezienia trzeciego zdjecia, jesli nie ma -> swipe left
+        try:
+            wait.until(EC.element_t
 
                 input_box = self.driver.find_element_by_class_name('sendMessageForm__input')
                 input_box.send_keys(response)
@@ -163,7 +176,7 @@ class TinderBot():
                 pass
 
 
-      def send_mail(self, name_of_guy):
+     def send_mail(self, name_of_guy):
         #wysyłanie powiadomienia o randce
 
         message = MIMEText("You've got a new date invitation from", name_of_guy)
@@ -172,6 +185,14 @@ class TinderBot():
         message["Subject"] = "Tinder date"
 
         server.sendmail(email, email, message.as_string())
+        
+        
+      #tu będzie filtrowanie bio
+    def bio_filter(self, bio):
+                       
+       #tu będzie szukanie twarzy
+    def face_detector(self, pics)
+        
 
 
 
