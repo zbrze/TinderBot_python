@@ -2,12 +2,13 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-
 from time import sleep
 import dialogflow
-from loginInfo import email, password
 import os
 import dialogflow
+
+from loginInfo import email, password
+
 server=smtplib.SMTP('smtp.gmail.com',587)
 
 DIALOGFLOW_PROJECT_ID = 'diana-eoqlsq'
