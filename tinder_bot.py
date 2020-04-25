@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
+import re
 import smtplib
 from email.mime.text import MIMEText
 from loginInfo import email, password
@@ -19,7 +20,7 @@ DIALOGFLOW_PROJECT_ID = 'diana-eoqlsq'
 DIALOGFLOW_LANGUAGE_CODE = 'pl'
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = './diana-eoqlsq-98249f138627.json'
 SESSION_ID = '118197476799899566966'
-server.login(email,password)
+# server.login(email,password)
 
 class TinderBot():
     def __init__(self):
@@ -37,6 +38,13 @@ class TinderBot():
         # znalezienie przycisku odpowiedzialnego za logowanie przy pomocy facebooka
         # loginButton = self.driver.find_element_by_xpath('//*[@id="modal-manager"]/div/div/div/div/div[3]/span/div[2]/button')
         # loginButton.click()
+
+        # zawsze w bloku try zeby nie wyrzucalo bledu jak nie znajdzie
+        try:
+            privacyButton = wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[1]/div/div[2]/div/div/div[1]/button/span")))
+            privacyButton.click()
+        except:
+            pass
 
         try:
             moreOptions = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@class='Td(u) Cur(p) Fw($medium) Tt(u)--ml focus-outline-style'][.='Więcej opcji']")))
@@ -89,17 +97,14 @@ class TinderBot():
 
     def swipe(self):
         wait = WebDriverWait(self.driver, 5)
-        swipeLeftButton = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[2]/div[2]/button')))
-        swipeRightButton = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[2]/div[4]/button')))
 
-        # proba znalezienia trzeciego zdjecia, jesli nie ma -> swipe left
-        try:
-            wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[1]/div[2]/button[3]')))
+        if self.checkPhotos() and self.checkDescription():
+            swipeRightButton = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div[2]/div/div/div[4]/button')))
             swipeRightButton.click()
-        except:
+        else:
+            swipeLeftButton = wait.until(EC.element_to_be_clickable(
+                (By.XPATH, '/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div[2]/div/div/div[2]/button')))
             swipeLeftButton.click()
-        # finally:
-            # sleep(2)
 
         # zamkniecie ewentualnego powiadomienia o nowym matchu
         try:
@@ -107,8 +112,7 @@ class TinderBot():
             continueSwiping.click()
         except:
             pass
-        # sleep(1)
-        
+
     def chat_bot(self, xd, name_of_guy):
         session_client = dialogflow.SessionsClient()
         session = session_client.session_path(DIALOGFLOW_PROJECT_ID, SESSION_ID)
@@ -130,8 +134,8 @@ class TinderBot():
         message["Subject"] = "Tinder date"
 
         server.sendmail(email, email, message.as_string())
-        
-        
+
+
     def chat(self):
         wait = WebDriverWait(self.driver, 5)
         messagesButton = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="messages-tab"]')))
@@ -167,9 +171,48 @@ class TinderBot():
             except:
                 pass
 
+    def checkDescription(self):
+        wait = WebDriverWait(self.driver, 5)
+        profileOk = True
+        # rozwiniecie opisu
+        try:
+            # descriptionButton = self.driver.find_element_by_xpath('/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[6]/button/svg/path')
+            descriptionButton = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[6]/button')))
+            descriptionButton.click()
+            # sprawdzenie czy słowo wystepuje
+            with open("keywords", "r") as keywordsFile:
+                description = wait.until(EC.presence_of_element_located((By.XPATH, "/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[2]/div[2]"))).text
+                print(description)
+                keywords = keywordsFile.readlines()
+                for index in range(0, len(keywords) - 1):
+                    # usuniecie znaku konca linii
+                    # keywords[index] = keywords[index][:len(keywords[index]) - 1]
+                    keywords[index] = re.split("\n", keywords[index])
+                    keywords[index] = keywords[index][0]
+                    # if keywords[index] in self.driver.find_element_by_xpath('/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[2]/div[2]/div/span'):
+                    if keywords[index] in description:
+                        profileOk = False
+        except:
+            profileOk = False
+
+        # zamkniecie opisu
+        exitDescription = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[1]/span/a[1]')))
+        exitDescription.click()
+        return profileOk
+
+    # proba znalezienia trzeciego zdjecia, jesli nie ma -> swipe left
+    def checkPhotos(self):
+        wait = WebDriverWait(self.driver, 5)
+        try:
+            wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[1]/div[2]/button[3]')))
+            return True
+        except:
+            return False
+
+
 
 a = TinderBot()
 a.launchTinder()
-# for i in range(1, 5):
-#     a.swipe()
-a.chat()
+for i in range(0, 15):
+    a.swipe()
+# a.chat()
