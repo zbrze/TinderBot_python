@@ -22,22 +22,33 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = './diana-eoqlsq-98249f138627.json
 SESSION_ID = '118197476799899566966'
 # server.login(email,password)
 
+
 class TinderBot():
+    keywords: []
+    keywordsVerification: []
+    keywordsVerificationKey: []
+
     def __init__(self):
         options = webdriver.ChromeOptions()
         options.add_argument("--start-maximized")
         self.driver = webdriver.Chrome(chrome_options=options)
-
+        with open("keywords", "r") as keywordsFile, open("keywordsVerification", "r") as keywordsVerificationFile:
+            self.keywords = keywordsFile.readlines()
+            self.keywordsVerification = keywordsVerificationFile.readlines()
+            for i in range(0, len(self.keywordsVerification)):
+                # usuniecie znaku konca linii
+                tmp = re.split("\n", self.keywordsVerification[i])
+                self.keywordsVerification[i] = tmp[0]
+                # podział pliku weryfikujacego (klucz:wartosci)
+                tmp = re.split(":", self.keywordsVerification[i])
+                self.keywordsVerificationKey.append(tmp[0])
+                # podział wartości zeby potem sprawdzac je w opisie
+                self.keywordsVerification[i] = re.split(", ", tmp[1])
 
     def launchTinder(self):
         # uruchomienie aplikacji
         self.driver.get('https://tinder.com/')
         wait = WebDriverWait(self.driver, 5)
-
-
-        # znalezienie przycisku odpowiedzialnego za logowanie przy pomocy facebooka
-        # loginButton = self.driver.find_element_by_xpath('//*[@id="modal-manager"]/div/div/div/div/div[3]/span/div[2]/button')
-        # loginButton.click()
 
         # zawsze w bloku try zeby nie wyrzucalo bledu jak nie znajdzie
         try:
@@ -72,6 +83,7 @@ class TinderBot():
 
         try:
             localizationButton = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@class='button Lts($ls-s) Z(0) CenterAlign Mx(a) Cur(p) Tt(u) Ell Bdrs(100px) Px(24px) Px(20px)--s Py(0) Mih(40px) Pos(r) Ov(h) C(#fff) Bg($c-pink):h::b Bg($c-pink):f::b Bg($c-pink):a::b Trsdu($fast) Trsp($background) Bg($primary-gradient) button--primary-shadow StyledButton Fw($semibold) focus-button-style W(225px) W(a)'][.='Zezwól']")))
+            # localizationButton = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@class='button Lts($ls-s) Z(0) CenterAlign Mx(a) Cur(p) Tt(u) Ell Bdrs(100px) Px(24px) Px(20px)--s Py(0) Mih(40px) Pos(r) Ov(h) C(#fff) Bg($c-pink):h::b Bg($c-pink):f::b Bg($c-pink):a::b Trsdu($fast) Trsp($background) Bg($primary-gradient) button--primary-shadow StyledButton Fw($semibold) focus-button-style W(225px) W(a)][.='Zezwól']")))
             localizationButton.click()
         except:
             pass
@@ -174,24 +186,31 @@ class TinderBot():
     def checkDescription(self):
         wait = WebDriverWait(self.driver, 5)
         profileOk = True
-        # rozwiniecie opisu
         try:
+            # rozwiniecie opisu
             # descriptionButton = self.driver.find_element_by_xpath('/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[6]/button/svg/path')
             descriptionButton = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[6]/button')))
             descriptionButton.click()
-            # sprawdzenie czy słowo wystepuje
-            with open("keywords", "r") as keywordsFile:
-                description = wait.until(EC.presence_of_element_located((By.XPATH, "/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[2]/div[2]"))).text
-                print(description)
-                keywords = keywordsFile.readlines()
-                for index in range(0, len(keywords) - 1):
-                    # usuniecie znaku konca linii
-                    # keywords[index] = keywords[index][:len(keywords[index]) - 1]
-                    keywords[index] = re.split("\n", keywords[index])
-                    keywords[index] = keywords[index][0]
-                    # if keywords[index] in self.driver.find_element_by_xpath('/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[2]/div[2]/div/span'):
-                    if keywords[index] in description:
-                        profileOk = False
+
+            description = wait.until(EC.presence_of_element_located((By.XPATH, "/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[2]/div[2]"))).text
+            description = None
+
+            print(description)
+            if description == [] or description is None:
+                profileOk = False
+
+            # szukamy czy zakazane slowo/wyrazenie wystepuje na stronie
+            for i in range(0, len(self.keywords)):
+                if self.keywords[i] in description:
+                    word = self.keywords[i].lower()
+                    profileOk = False
+                    # jesli wystepuje, szukamy czy jest to fraza ktora nie jest zakazana
+                    for j in range(0, len(self.keywordsVerificationKey)):
+                        if word == self.keywordsVerificationKey[j]:
+                            for k in self.keywordsVerification[j] and not profileOk:
+                                if k in description:
+                                    profileOk = True
+
         except:
             profileOk = False
 
@@ -213,6 +232,6 @@ class TinderBot():
 
 a = TinderBot()
 a.launchTinder()
-for i in range(0, 15):
+for a in range(0, 15):
     a.swipe()
 # a.chat()
