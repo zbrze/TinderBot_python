@@ -32,6 +32,7 @@ class TinderBot():
         options = webdriver.ChromeOptions()
         options.add_argument("--start-maximized")
         self.driver = webdriver.Chrome(chrome_options=options)
+        self.keywordsVerificationKey = []
         with open("keywords", "r") as keywordsFile, open("keywordsVerification", "r") as keywordsVerificationFile:
             self.keywords = keywordsFile.readlines()
             self.keywordsVerification = keywordsVerificationFile.readlines()
@@ -110,7 +111,10 @@ class TinderBot():
     def swipe(self):
         wait = WebDriverWait(self.driver, 5)
 
-        if self.checkPhotos() and self.checkDescription():
+        # if self.checkPhotos() and self.checkDescription():
+        p = self.checkPhotos()
+        q = self.checkDescription()
+        if p and q:
             swipeRightButton = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div[2]/div/div/div[4]/button')))
             swipeRightButton.click()
         else:
@@ -193,9 +197,9 @@ class TinderBot():
             descriptionButton.click()
 
             description = wait.until(EC.presence_of_element_located((By.XPATH, "/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[2]/div[2]"))).text
-            description = None
+            # description = None
 
-            print(description)
+            print("OPIS:\n", description)
             if description == [] or description is None:
                 profileOk = False
 
@@ -229,9 +233,8 @@ class TinderBot():
             return False
 
 
-
-a = TinderBot()
-a.launchTinder()
+bot = TinderBot()
+bot.launchTinder()
 for a in range(0, 15):
-    a.swipe()
+    bot.swipe()
 # a.chat()
