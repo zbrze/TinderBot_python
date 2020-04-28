@@ -5,16 +5,21 @@ from selenium.webdriver.support import expected_conditions as EC
 import re
 import smtplib
 from email.mime.text import MIMEText
-from loginInfo import email, password
-import os
+import cv2
+import sys
+from PIL import Image
+import requests
+from io import BytesIO
+from time import sleep
 import dialogflow
+import os
+
+
+from loginInfo import email, password
+
 
 server=smtplib.SMTP('smtp.gmail.com',587)
 
-from time import sleep
-import dialogflow
-from loginInfo import email, password
-import os
 
 DIALOGFLOW_PROJECT_ID = 'diana-eoqlsq'
 DIALOGFLOW_LANGUAGE_CODE = 'pl'
@@ -62,7 +67,10 @@ class TinderBot():
             moreOptions = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@class='Td(u) Cur(p) Fw($medium) Tt(u)--ml focus-outline-style'][.='Więcej opcji']")))
             moreOptions.click()
         except:
-            pass
+        
+        
+        
+        
 
         try:
             loginByFB = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@class='button Lts($ls-s) Z(0) CenterAlign Mx(a) Pos(r) Cur(p) Tt(u) Bdrs(100px) Px(48px) Px(40px)--s Py(0) Mih(54px) button--outline Bdw(2px) Bds(s) Trsdu($fast) Bdc($c-secondary) C($c-secondary) Bdc($c-base):h C($c-base):h Bdc($c-base):f C($c-base):f Bdc($c-base):a C($c-base):a Fw($semibold) focus-button-style Mb(20px)--ml W(100%)--ml W(100%)--s Fz(4vw)--s'][.='Zaloguj się przez Facebooka']")))
@@ -114,7 +122,12 @@ class TinderBot():
         # if self.checkPhotos() and self.checkDescription():
         p = self.checkPhotos()
         q = self.checkDescription()
-        if p and q:
+        
+        photoElement = self.driver.find_element_by_xpath('/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[1]/div[1]/div/div[4]/div/div')
+        photoPath = photoElement.get_attribute("src")
+        r = self.findFace(photoPath)
+        
+        if p and q and r:
             swipeRightButton = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div[2]/div/div/div[4]/button')))
             swipeRightButton.click()
         else:
@@ -136,8 +149,13 @@ class TinderBot():
         query_input = dialogflow.types.QueryInput(text=text_input)
         response = session_client.detect_intent(session=session, query_input=query_input)
         #sprawdzanie czy intent jest typu propozycja spotkania
+        
         if(response.query_result.intent.display_name == "meeting prop"):
+            #jesli intent wiadomości to meeting prop - w Dialogflow folder z propozycjami spotkania
+            #wysyłąmy email
             self.send_mail(name_of_guy)
+            return 'daj mi się zastanowić :)'
+            
         if response:
             return response.query_result.fulfillment_text
         else:
@@ -160,13 +178,14 @@ class TinderBot():
         sleep(2)
         # chat_windows = wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'messageListItem')))
         chat_windows = self.driver.find_elements_by_class_name('messageListItem')
+        
         for convo in chat_windows:
             convo.click()
             sleep(3)
             # all_messages = wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'msg')))
             all_messages = self.driver.find_elements_by_class_name('msg')
             last_message = all_messages[-1]
-            # last_message = all_messages[0]
+            # last_message = all_messages   [0]
             print(str(last_message))
             #teraz sprawdzamy czy ostatnia wiadomość na czacie została napisana przez nas czy przez parę -
             #wiadomości napisane przez parę mają kolor #000
@@ -231,6 +250,34 @@ class TinderBot():
             return True
         except:
             return False
+
+    def findFace(self, photoPath):
+        #pobieramy zdjęcie z adresu url
+        photo = requests.get(photoPath)
+        photoImage = Image.open(BytesIO(photo.content))
+        cascPath = "data/haarcascades/haarcascade_frontalface_default.xml"
+        faceDetector = cv2.CascadeClassifier(cascPath)
+        photoGray = cv2.imread(photoImage)
+        photo = cv2.cvtColor(photo, cv2.COLOR_BGR2GRAY)
+        #konwertujemy zdjęcie do skali szarości
+        faces = faceDetector.detectMultiScale(
+            photoGray,
+            scaleFactor=1.1,
+            minNeighbors=5,
+            minSize=(30, 30),
+            flags=cv2.CASCADE_SCALE_IMAGE
+        )
+        #szukamy twarzy
+        #nie znaleziono twarzy
+        if(len(faces) == 0):
+            return False
+        else:
+        #nie znaleziono twarzy
+            return True
+
+
+
+
 
 
 bot = TinderBot()
