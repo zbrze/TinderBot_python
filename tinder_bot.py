@@ -49,7 +49,7 @@ class TinderBot():
                 # podział wartości zeby potem sprawdzac je w opisie
                 self.keywordsVerification[i] = re.split(", ", tmp[1])
 
-   def launchTinder(self):
+    def launchTinder(self):
         # uruchomienie aplikacji
         self.driver.get('https://tinder.com/')
         wait = WebDriverWait(self.driver, 5)
@@ -118,11 +118,12 @@ class TinderBot():
         # if self.checkPhotos() and self.checkDescription():
         p = self.checkPhotos()
         q = self.checkDescription()
-        
-        photoElement = self.driver.find_element_by_xpath('/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[1]/div[1]/div/div[4]/div/div')
+
+        # photoElement = self.driver.find_element_by_xpath('/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[1]/div[1]/div/div[4]/div/div')
+        photoElement = wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[1]/div[1]/div/div[1]/div/div')))
         photoPath = photoElement.get_attribute("src")
         r = self.findFace(photoPath)
-        
+
         if p and q and r:
             swipeRightButton = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div[2]/div/div/div[4]/button')))
             swipeRightButton.click()
