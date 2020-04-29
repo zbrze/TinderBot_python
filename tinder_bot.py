@@ -118,13 +118,14 @@ class TinderBot():
         # if self.checkPhotos() and self.checkDescription():
         p = self.checkPhotos()
         q = self.checkDescription()
-        r = self.findFace()
+        # r = self.findFace()
         # photoElement = self.driver.find_element_by_xpath('/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[1]/div[1]/div/div[4]/div/div')
         # photoElement = wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[1]/div[1]/div/div[1]/div/div')))
         # photoPath = photoElement.get_attribute("src")
         # r = self.findFace(photoPath)
 
-        if p and q and r:
+        # if p and q and r:
+        if p and q:
             swipeRightButton = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div[2]/div/div/div[4]/button')))
             swipeRightButton.click()
         else:
@@ -136,6 +137,13 @@ class TinderBot():
         try:
             continueSwiping = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="modal-manager-canvas"]/div/div/div[1]/div/div[3]/a')))
             continueSwiping.click()
+        except:
+            pass
+
+        # nie dodanie skrotu na pulpit
+        try:
+            dontAddShortcut = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[@class='button Lts($ls-s) Z(0) CenterAlign Mx(a) Cur(p) Tt(u) Ell Bdrs(100px) Px(24px) Px(20px)--s Py(0) Mih(42px)--s Mih(50px)--ml Fw($semibold) focus-button-style D(b) Mx(a) C($c-secondary) C($c-base):h'][.='Nie interesuje mnie to']")))
+            dontAddShortcut.click()
         except:
             pass
 
@@ -241,7 +249,7 @@ class TinderBot():
 
     # proba znalezienia trzeciego zdjecia, jesli nie ma -> swipe left
     def checkPhotos(self):
-        wait = WebDriverWait(self.driver, 5)
+        wait = WebDriverWait(self.driver, 3)
         try:
             wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[1]/div[2]/button[3]')))
             return True
