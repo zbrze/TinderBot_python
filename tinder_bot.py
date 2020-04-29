@@ -253,6 +253,7 @@ class TinderBot():
         cascPath = "data/haarcascades/haarcascade_frontalface_default.xml"
         faceDetector = cv2.CascadeClassifier(cascPath)
         photo = cv2.imread(photoPath)
+        cv2.imshow('image', photo)
         photoGray = cv2.cvtColor(photo, cv2.COLOR_BGR2GRAY)
         #konwertujemy zdjęcie do skali szarości
         faces = faceDetector.detectMultiScale(
