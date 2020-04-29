@@ -7,8 +7,6 @@ import smtplib
 from email.mime.text import MIMEText
 import cv2
 import sys
-from PIL import Image
-import requests
 from io import BytesIO
 from time import sleep
 import dialogflow
@@ -251,12 +249,10 @@ class TinderBot():
 
     def findFace(self, photoPath):
         #pobieramy zdjęcie z adresu url
-        photo = requests.get(photoPath)
-        photoImage = Image.open(BytesIO(photo.content))
         cascPath = "data/haarcascades/haarcascade_frontalface_default.xml"
         faceDetector = cv2.CascadeClassifier(cascPath)
-        photoGray = cv2.imread(photoImage)
-        photo = cv2.cvtColor(photo, cv2.COLOR_BGR2GRAY)
+        photo = cv2.imread(photoPath)
+        photoGray = cv2.cvtColor(photo, cv2.COLOR_BGR2GRAY)
         #konwertujemy zdjęcie do skali szarości
         faces = faceDetector.detectMultiScale(
             photoGray,
