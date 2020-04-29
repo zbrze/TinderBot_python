@@ -118,11 +118,11 @@ class TinderBot():
         # if self.checkPhotos() and self.checkDescription():
         p = self.checkPhotos()
         q = self.checkDescription()
-
+        r = self.findFace()
         # photoElement = self.driver.find_element_by_xpath('/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[1]/div[1]/div/div[4]/div/div')
-        photoElement = wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[1]/div[1]/div/div[1]/div/div')))
-        photoPath = photoElement.get_attribute("src")
-        r = self.findFace(photoPath)
+        # photoElement = wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[1]/div[1]/div/div[1]/div/div')))
+        # photoPath = photoElement.get_attribute("src")
+        # r = self.findFace(photoPath)
 
         if p and q and r:
             swipeRightButton = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div[2]/div/div/div[4]/button')))
@@ -248,7 +248,13 @@ class TinderBot():
         except:
             return False
 
-    def findFace(self, photoPath):
+    def findFace(self):
+        wait = WebDriverWait(self.driver, 5)
+        try:
+            photoElement = wait.until(EC.presence_of_element_located((By.XPATH,'/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[1]/div[1]/div/div[1]/div/div')))
+            photoPath = photoElement.get_attribute("src")
+        except:
+            return False
         #pobieramy zdjęcie z adresu url
         cascPath = "data/haarcascades/haarcascade_frontalface_default.xml"
         faceDetector = cv2.CascadeClassifier(cascPath)
