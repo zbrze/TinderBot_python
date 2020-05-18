@@ -14,7 +14,7 @@ from io import BytesIO
 from time import sleep
 import dialogflow
 import os
-from loginInfo import email, password
+from loginInfo import email, password, faceLibraryPath, savePicturesDirectory
 
 
 server = smtplib.SMTP('smtp.gmail.com', 587)
@@ -67,25 +67,9 @@ class TinderBot():
         # przyciskow szukamy zawsze w bloku try zeby nie wyrzucalo bledu jak nie znajdzie bo nie zawsze znaczy to ze trzeba przerwac program
 
         # 0 -> privacyButton, 1 -> moreOptions, 2 -> loginByFB
-
         buttons = []
-        # try:
-        #     # for i in range(0, 3):
-        #     #     print(i)
-        #     #     buttons[i] = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[i])))
-        #     #     buttons[i].click()
-        #     privacyButton = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[0])))
-        #     privacyButton.click()
-        #     moreOptions = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[1])))
-        #     moreOptions.click()
-        #     loginByFB = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[2])))
-        #     loginByFB.click()
-        # except:
-        #         pass
-
         for i in range(0, 3):
             try:
-                print(self.paths[i])
                 buttons.append(wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[i]))))
                 buttons[len(buttons) - 1].click()
             except:
@@ -106,8 +90,8 @@ class TinderBot():
         # 6 -> localizationButton, 7 -> noNotificationsButton, 8 -> cookiesButton, 9 -> noLocalizationChangeButton
         for i in range(6, 10):
             try:
-                button = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[i])))
-                button.click()
+                buttons.append(wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[i]))))
+                buttons[len(buttons) - 1].click()
             except:
                 pass
 
@@ -263,7 +247,8 @@ class TinderBot():
         wait = WebDriverWait(self.driver, 5)
         self.driver.get_screenshot_as_file('screenshot.png')
         img = cv2.imread('screenshot.png')
-        face_cascade = cv2.CascadeClassifier(r'C:\Users\User\PycharmProjects\tinderbot\venv\Lib\site-packages\cv2\data\haarcascade_frontalface_default.xml')
+        # face_cascade = cv2.CascadeClassifier(r'C:\Users\User\PycharmProjects\tinderbot\venv\Lib\site-packages\cv2\data\haarcascade_frontalface_default.xml')
+        face_cascade = cv2.CascadeClassifier(faceLibraryPath)
         print(face_cascade)
         crop_img = img[400:530, 900:1000]
         cv2.imwrite("cropp.png", crop_img)
@@ -283,10 +268,11 @@ class TinderBot():
         # nie znaleziono twarzy
         if (len(faces) == 0):
             print("no face found")
-            directory = 'C:/Users/User/Pictures/tinder_faces'
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-            cv2.imwrite(directory + '/' + description + ".png", img1)
+            # directory = 'C:/Users/User/Pictures/tinder_faces'
+            # if not os.path.exists(directory):
+            if not os.path.exists(savePicturesDirectory):
+                os.makedirs(savePicturesDirectory)
+            cv2.imwrite(savePicturesDirectory + '/' + description + ".png", img1)
             return False
         else:
             return True
