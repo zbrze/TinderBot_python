@@ -1,3 +1,5 @@
+# coding=utf-8
+
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
@@ -51,15 +53,12 @@ class TinderBot():
                 self.keywordsVerification[i] = re.split(", ", tmp[1])
 
             # pobranie xpathow z pliku
-            self.paths = pathsFile.readlines();
+            self.paths = pathsFile.readlines()
             for i in range(0, len(self.paths)):
-                print(self.paths[i])
                 tmp = re.split("\n", self.paths[i])
                 self.paths[i] = tmp[0]
-                print(self.paths[i])
                 tmp = re.split(" \+ ", self.paths[i])
                 self.paths[i] = tmp[1]
-                print(self.paths[i])
 
     def launchTinder(self):
         # uruchomienie aplikacji
@@ -69,10 +68,27 @@ class TinderBot():
         # przyciskow szukamy zawsze w bloku try zeby nie wyrzucalo bledu jak nie znajdzie bo nie zawsze znaczy to ze trzeba przerwac program
 
         # 0 -> privacyButton, 1 -> moreOptions, 2 -> loginByFB
+
+        buttons = []
+        # try:
+        #     # for i in range(0, 3):
+        #     #     print(i)
+        #     #     buttons[i] = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[i])))
+        #     #     buttons[i].click()
+        #     privacyButton = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[0])))
+        #     privacyButton.click()
+        #     moreOptions = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[1])))
+        #     moreOptions.click()
+        #     loginByFB = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[2])))
+        #     loginByFB.click()
+        # except:
+        #         pass
+
         for i in range(0, 3):
             try:
-                button = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[i])))
-                button.click()
+                print(self.paths[i])
+                buttons.append(wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[i]))))
+                buttons[len(buttons) - 1].click()
             except:
                 pass
 
