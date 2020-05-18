@@ -12,10 +12,9 @@ from io import BytesIO
 from time import sleep
 import dialogflow
 import os
+from loginInfo import email, password
 
 
-email = 'dianaraskoln@gmail.com'
-password = 'tinderbot'
 server = smtplib.SMTP('smtp.gmail.com', 587)
 DIALOGFLOW_PROJECT_ID = 'diana-eoqlsq'
 DIALOGFLOW_LANGUAGE_CODE = 'pl'
