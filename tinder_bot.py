@@ -14,10 +14,9 @@ from io import BytesIO
 from time import sleep
 import dialogflow
 import os
+from loginInfo import email, password
 
 
-email = 'dianaraskoln@gmail.com'
-password = 'tinderbot'
 server = smtplib.SMTP('smtp.gmail.com', 587)
 DIALOGFLOW_PROJECT_ID = 'diana-eoqlsq'
 DIALOGFLOW_LANGUAGE_CODE = 'pl'
@@ -284,7 +283,10 @@ class TinderBot():
         # nie znaleziono twarzy
         if (len(faces) == 0):
             print("no face found")
-            cv2.imwrite(r"C:\Users\User\Documents\zuzaPO\img\face" + description + ".png", img1)
+            directory = 'C:/Users/User/Pictures/tinder_faces'
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+            cv2.imwrite(directory + '/' + description + ".png", img1)
             return False
         else:
             return True
