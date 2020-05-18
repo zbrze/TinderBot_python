@@ -1,4 +1,4 @@
-# coding=utf-8
+import codecs
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -38,7 +38,7 @@ class TinderBot():
         options.add_argument("--start-maximized")
         self.driver = webdriver.Chrome(chrome_options=options)
         self.keywordsVerificationKey = []
-        with open("keywords", "r") as keywordsFile, open("keywordsVerification", "r") as keywordsVerificationFile, open("paths", "r") as pathsFile:
+        with open("keywords", "r") as keywordsFile, open("keywordsVerification", "r") as keywordsVerificationFile, codecs.open("paths", "r", "utf-8") as pathsFile:
             self.keywords = keywordsFile.readlines()
             self.keywordsVerification = keywordsVerificationFile.readlines()
             for i in range(0, len(self.keywordsVerification)):
