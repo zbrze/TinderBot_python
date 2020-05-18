@@ -30,13 +30,14 @@ class TinderBot():
     keywords: []
     keywordsVerification: []
     keywordsVerificationKey: []
+    paths: []
 
     def __init__(self):
         options = webdriver.ChromeOptions()
         options.add_argument("--start-maximized")
         self.driver = webdriver.Chrome(chrome_options=options)
         self.keywordsVerificationKey = []
-        with open("keywords", "r") as keywordsFile, open("keywordsVerification", "r") as keywordsVerificationFile:
+        with open("keywords", "r") as keywordsFile, open("keywordsVerification", "r") as keywordsVerificationFile, open("paths", "r") as pathsFile:
             self.keywords = keywordsFile.readlines()
             self.keywordsVerification = keywordsVerificationFile.readlines()
             for i in range(0, len(self.keywordsVerification)):
@@ -49,73 +50,51 @@ class TinderBot():
                 # podział wartości zeby potem sprawdzac je w opisie
                 self.keywordsVerification[i] = re.split(", ", tmp[1])
 
+            # pobranie xpathow z pliku
+            self.paths = pathsFile.readlines();
+            for i in range(0, len(self.paths)):
+                print(self.paths[i])
+                tmp = re.split("\n", self.paths[i])
+                self.paths[i] = tmp[0]
+                print(self.paths[i])
+                tmp = re.split(" \+ ", self.paths[i])
+                self.paths[i] = tmp[1]
+                print(self.paths[i])
+
     def launchTinder(self):
         # uruchomienie aplikacji
         self.driver.get('https://tinder.com/')
         wait = WebDriverWait(self.driver, 5)
 
-        # zawsze w bloku try zeby nie wyrzucalo bledu jak nie znajdzie
-        try:
-            privacyButton = wait.until(
-                EC.element_to_be_clickable((By.XPATH, "/html/body/div[1]/div/div[2]/div/div/div[1]/button/span")))
-            privacyButton.click()
-        except:
-            pass
+        # przyciskow szukamy zawsze w bloku try zeby nie wyrzucalo bledu jak nie znajdzie bo nie zawsze znaczy to ze trzeba przerwac program
 
-        try:
-            moreOptions = wait.until(EC.element_to_be_clickable((By.XPATH,
-                                                                 "//button[@class='Td(u) Cur(p) Fw($medium) Tt(u)--ml focus-outline-style'][.='Więcej opcji']")))
-            moreOptions.click()
-        except:
-            pass
-
-        try:
-            loginByFB = wait.until(EC.element_to_be_clickable((By.XPATH,
-                                                               "//button[@class='button Lts($ls-s) Z(0) CenterAlign Mx(a) Pos(r) Cur(p) Tt(u) Bdrs(100px) Px(48px) Px(40px)--s Py(0) Mih(54px) button--outline Bdw(2px) Bds(s) Trsdu($fast) Bdc($c-secondary) C($c-secondary) Bdc($c-base):h C($c-base):h Bdc($c-base):f C($c-base):f Bdc($c-base):a C($c-base):a Fw($semibold) focus-button-style Mb(20px)--ml W(100%)--ml W(100%)--s Fz(4vw)--s'][.='Zaloguj się przez Facebooka']")))
-            loginByFB.click()
-        except:
-            pass
+        # 0 -> privacyButton, 1 -> moreOptions, 2 -> loginByFB
+        for i in range(0, 3):
+            try:
+                button = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[i])))
+                button.click()
+            except:
+                pass
 
         baseWindow = self.driver.window_handles[0]
         self.driver.switch_to_window(self.driver.window_handles[1])
 
-        emailInput = self.driver.find_element_by_xpath('//*[@id="email"]')
+        emailInput = self.driver.find_element_by_xpath(self.paths[3])
         emailInput.send_keys(email)
-        passwordInput = self.driver.find_element_by_xpath('//*[@id="pass"]')
+        passwordInput = self.driver.find_element_by_xpath(self.paths[4])
         passwordInput.send_keys(password)
-        confirmButton = self.driver.find_element_by_xpath('//*[@id="u_0_0"]')
+        confirmButton = self.driver.find_element_by_xpath(self.paths[5])
         confirmButton.click()
 
         self.driver.switch_to_window(baseWindow)
 
-        try:
-            localizationButton = wait.until(EC.element_to_be_clickable((By.XPATH,
-                                                                        "//button[@class='button Lts($ls-s) Z(0) CenterAlign Mx(a) Cur(p) Tt(u) Ell Bdrs(100px) Px(24px) Px(20px)--s Py(0) Mih(40px) Pos(r) Ov(h) C(#fff) Bg($c-pink):h::b Bg($c-pink):f::b Bg($c-pink):a::b Trsdu($fast) Trsp($background) Bg($primary-gradient) button--primary-shadow StyledButton Fw($semibold) focus-button-style W(225px) W(a)'][.='Zezwól']")))
-            # localizationButton = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@class='button Lts($ls-s) Z(0) CenterAlign Mx(a) Cur(p) Tt(u) Ell Bdrs(100px) Px(24px) Px(20px)--s Py(0) Mih(40px) Pos(r) Ov(h) C(#fff) Bg($c-pink):h::b Bg($c-pink):f::b Bg($c-pink):a::b Trsdu($fast) Trsp($background) Bg($primary-gradient) button--primary-shadow StyledButton Fw($semibold) focus-button-style W(225px) W(a)][.='Zezwól']")))
-            localizationButton.click()
-        except:
-            pass
-
-        try:
-            noNotificationsButton = wait.until(EC.element_to_be_clickable((By.XPATH,
-                                                                           "//button[@class='button Lts($ls-s) Z(0) CenterAlign Mx(a) Cur(p) Tt(u) Ell Bdrs(100px) Px(24px) Px(20px)--s Py(0) Mih(40px) Fw($semibold) focus-button-style W(a) C($c-dark-gray)'][.='Nie interesuje mnie to']")))
-            noNotificationsButton.click()
-        except:
-            pass
-
-        try:
-            cookiesButton = wait.until(EC.element_to_be_clickable((By.XPATH,
-                                                                   "//button[@class='button Lts($ls-s) Z(0) CenterAlign Mx(a) Cur(p) Tt(u) Ell Bdrs(100px) Px(24px) Px(20px)--s Py(0) Mih(40px) button--outline Bdw(2px) Bds(s) Trsdu($fast) Bdc($c-secondary) C($c-secondary) Bdc($c-base):h C($c-base):h Bdc($c-base):f C($c-base):f Bdc($c-base):a C($c-base):a Fw($semibold) focus-button-style'][.='Wyrażam zgodę']")))
-            cookiesButton.click()
-        except:
-            pass
-
-        try:
-            noLocalizationChangeButton = wait.until(EC.element_to_be_clickable((By.XPATH,
-                                                                                "//button[@class='button Lts($ls-s) Z(0) CenterAlign Mx(a) Cur(p) Tt(u) Ell Bdrs(100px) Px(24px) Px(20px)--s Py(0) Mih(40px) Fw($semibold) focus-button-style C(#fff) Mb(8px)'][.='Nie, dziękuję']")))
-            noLocalizationChangeButton.click()
-        except:
-            pass
+        # 6 -> localizationButton, 7 -> noNotificationsButton, 8 -> cookiesButton, 9 -> noLocalizationChangeButton
+        for i in range(6, 10):
+            try:
+                button = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[i])))
+                button.click()
+            except:
+                pass
 
     def swipe(self):
         wait = WebDriverWait(self.driver, 5)
@@ -131,13 +110,11 @@ class TinderBot():
 
         # if p and q and r:
         if p and q:
-            swipeRightButton = wait.until(EC.element_to_be_clickable(
-                (By.XPATH, '/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div[2]/div/div/div[4]/button')))
+            swipeRightButton = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[10])))
             swipeRightButton.click()
         else:
-            swipeLeftButton = wait.until(EC.element_to_be_clickable(
-                (By.XPATH, '/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div[2]/div/div/div[2]/button')))
-            swipeLeftButton.click()
+            continueSwiping = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[12])))
+            continueSwiping.click()
 
         # zamkniecie ewentualnego powiadomienia o nowym matchu
         try:
@@ -149,8 +126,7 @@ class TinderBot():
 
         # nie dodanie skrotu na pulpit
         try:
-            dontAddShortcut = wait.until(EC.element_to_be_clickable((By.XPATH,
-                                                                     "//button[@class='button Lts($ls-s) Z(0) CenterAlign Mx(a) Cur(p) Tt(u) Ell Bdrs(100px) Px(24px) Px(20px)--s Py(0) Mih(42px)--s Mih(50px)--ml Fw($semibold) focus-button-style D(b) Mx(a) C($c-secondary) C($c-base):h'][.='Nie interesuje mnie to']")))
+            dontAddShortcut = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[13])))
             dontAddShortcut.click()
         except:
             pass
@@ -189,8 +165,7 @@ class TinderBot():
 
     def chat(self):
         wait = WebDriverWait(self.driver, 5)
-        messagesButton = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="messages-tab"]')))
-        # messagesButton = self.driver.find_element_by_xpath('//*[@id="messages-tab"]')
+        messagesButton = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[14])))
         messagesButton.click()
         sleep(2)
         # chat_windows = wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'messageListItem')))
@@ -211,15 +186,14 @@ class TinderBot():
                 last_message_text = last_message.find_element_by_xpath(".//span").text
                 print(last_message_text)
                 print(str(last_message_text))
-                name_of_guy = self.driver.find_element_by_xpath(
-                    '//*[@id="matchListWithMessages"]/div[2]/a[1]/div[2]/div[1]/div/h3')
+                name_of_guy = self.driver.find_element_by_xpath(self.paths[15])
                 response = self.chat_bot(last_message_text, name_of_guy)
                 input_box = self.driver.find_element_by_class_name('sendMessageForm__input')
                 input_box.send_keys(response)
-                send_button = self.driver.find_element_by_xpath('//form/button[@type="submit"]')
+                send_button = self.driver.find_element_by_xpath(self.paths[16])
                 send_button.click()
             try:
-                x_button = self.driver.find_element_by_xpath('//a[@href="/app/matches"]')
+                x_button = self.driver.find_element_by_xpath(self.paths[17])
                 x_button.click()
             except:
                 pass
@@ -229,14 +203,10 @@ class TinderBot():
         profileOk = True
         try:
             # rozwiniecie opisu
-            # descriptionButton = self.driver.find_element_by_xpath('/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[6]/button/svg/path')
-            descriptionButton = wait.until(EC.element_to_be_clickable((By.XPATH,
-                                                                       '/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[6]/button')))
+            descriptionButton = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[18])))
             descriptionButton.click()
 
-            description = wait.until(EC.presence_of_element_located((By.XPATH,
-                                                                     "/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[2]/div[2]"))).text
-            # description = None
+            description = wait.until(EC.presence_of_element_located((By.XPATH, self.paths[19]))).text
 
             print("OPIS:\n", description)
             if description == [] or description is None:
@@ -258,8 +228,7 @@ class TinderBot():
             profileOk = False
 
         # zamkniecie opisu
-        exitDescription = wait.until(EC.element_to_be_clickable(
-            (By.XPATH, '/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[1]/span/a[1]')))
+        exitDescription = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[20])))
         exitDescription.click()
         return profileOk, description
 
@@ -268,8 +237,7 @@ class TinderBot():
     def checkPhotos(self):
         wait = WebDriverWait(self.driver, 3)
         try:
-            wait.until(EC.element_to_be_clickable((By.XPATH,
-                                                   '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[1]/div[2]/button[3]')))
+            wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[21])))
             return True
         except:
             return False
