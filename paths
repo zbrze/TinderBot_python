@@ -20,5 +20,3 @@ descriptionButton + /html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/
 description + /html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[2]/div[2]
 exitDescription + /html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[1]/span/a[1]
 thirdPhoto + //*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[1]/div[2]/button[3]
-photoElement + /html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[1]/div[1]/div/div[1]/div/div
-cascPath + data/haarcascades/haarcascade_frontalface_default.xml
