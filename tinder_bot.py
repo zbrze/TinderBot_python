@@ -271,7 +271,6 @@ class TinderBot():
             if not os.path.exists(directory):
                 os.makedirs(directory)
             cv2.imwrite(directory + '/' + description + ".png", img1)
-            cv2.imwrite(r"C:\Users\User\Documents\zuzaPO\img\face" + description + ".png", img1)
             return False
         else:
             return True
