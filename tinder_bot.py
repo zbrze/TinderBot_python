@@ -266,7 +266,7 @@ class TinderBot():
             minSize=(30, 30),
             flags=cv2.CASCADE_SCALE_IMAGE
         ))
-
+        x = len(faces[i])
         if (x == 0):
             print("no face detected")
             cv2.imwrite(savePicturesDirectory + str(i) + ".png", img1[i])
