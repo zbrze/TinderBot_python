@@ -10,7 +10,7 @@ cookiesButton + //button[@class='button Lts($ls-s) Z(0) CenterAlign Mx(a) Cur(p)
 noLocalizationChangeButton + //button[@class='button Lts($ls-s) Z(0) CenterAlign Mx(a) Cur(p) Tt(u) Ell Bdrs(100px) Px(24px) Px(20px)--s Py(0) Mih(40px) Fw($semibold) focus-button-style C(#fff) Mb(8px)'][.='Nie, dziękuję']
 swipeRightButton + /html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[2]/div[4]/button
 swipeLeftButton + /html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[2]/div[2]/button
-continueSwiping + //*[@id="modal-manager-canvas"]/div/div/div[1]/div/div[3]/a
+continueSwiping + /html/body/div[1]/div/div[1]/div/main/div[2]/div/div/div[1]/div/div[3]/a
 dontAddShortcut + //button[@class='button Lts($ls-s) Z(0) CenterAlign Mx(a) Cur(p) Tt(u) Ell Bdrs(100px) Px(24px) Px(20px)--s Py(0) Mih(42px)--s Mih(50px)--ml Fw($semibold) focus-button-style D(b) Mx(a) C($c-secondary) C($c-base):h'][.='Nie interesuje mnie to']
 messagesButton + //*[@id="messages-tab"]
 name_of_guy + //*[@id="matchListWithMessages"]/div[2]/a[1]/div[2]/div[1]/div/h3

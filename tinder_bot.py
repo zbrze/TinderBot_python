@@ -112,8 +112,7 @@ class TinderBot():
 
         # zamkniecie ewentualnego powiadomienia o nowym matchu
         try:
-            continueSwiping = wait.until(
-                EC.element_to_be_clickable((By.XPATH, self.paths[11])))
+            continueSwiping = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[11])))
             continueSwiping.click()
         except:
             pass
@@ -161,13 +160,21 @@ class TinderBot():
 
     def chat(self):
         wait = WebDriverWait(self.driver, 5)
-        messagesButton = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[14])))
-        messagesButton.click()
+        try:
+            messagesButton = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[14])))
+            messagesButton.click()
+        except:
+            print("cant open messages")
+            return
         sleep(2)
         # chat_windows = wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'messageListItem')))
         chat_windows = self.driver.find_elements_by_class_name('messageListItem')
 
+        counter = 0
         for convo in chat_windows:
+            if counter == 5:
+                return
+            counter += 1
             convo.click()
             sleep(3)
             # all_messages = wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'msg')))
@@ -226,8 +233,11 @@ class TinderBot():
             profileOk = False
 
         # zamkniecie opisu
-        exitDescription = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[20])))
-        exitDescription.click()
+        try:
+            exitDescription = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[20])))
+            exitDescription.click()
+        except:
+            pass
         return profileOk
 
 
