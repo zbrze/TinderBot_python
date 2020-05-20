@@ -14,15 +14,14 @@ from io import BytesIO
 from time import sleep
 import dialogflow
 import os
+from fer import FER
 from loginInfo import email, password, faceLibraryPath, savePicturesDirectory
-
-
 server = smtplib.SMTP('smtp.gmail.com', 587)
 DIALOGFLOW_PROJECT_ID = 'diana-eoqlsq'
 DIALOGFLOW_LANGUAGE_CODE = 'pl'
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = './diana-eoqlsq-98249f138627.json'
 SESSION_ID = '118197476799899566966'
-
+directory = 'C:/Users/User/Pictures/tinder_faces/'
 
 # server.login(email,password)
 
@@ -67,9 +66,25 @@ class TinderBot():
         # przyciskow szukamy zawsze w bloku try zeby nie wyrzucalo bledu jak nie znajdzie bo nie zawsze znaczy to ze trzeba przerwac program
 
         # 0 -> privacyButton, 1 -> moreOptions, 2 -> loginByFB
+
         buttons = []
+        # try:
+        #     # for i in range(0, 3):
+        #     #     print(i)
+        #     #     buttons[i] = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[i])))
+        #     #     buttons[i].click()
+        #     privacyButton = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[0])))
+        #     privacyButton.click()
+        #     moreOptions = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[1])))
+        #     moreOptions.click()
+        #     loginByFB = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[2])))
+        #     loginByFB.click()
+        # except:
+        #         pass
+
         for i in range(0, 3):
             try:
+                print(self.paths[i])
                 buttons.append(wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[i]))))
                 buttons[len(buttons) - 1].click()
             except:
@@ -90,18 +105,18 @@ class TinderBot():
         # 6 -> localizationButton, 7 -> noNotificationsButton, 8 -> cookiesButton, 9 -> noLocalizationChangeButton
         for i in range(6, 10):
             try:
-                buttons.append(wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[i]))))
-                buttons[len(buttons) - 1].click()
+                button = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[i])))
+                button.click()
             except:
                 pass
 
-    def swipe(self):
+    def swipe(self, i):
         wait = WebDriverWait(self.driver, 5)
 
         # if self.checkPhotos() and self.checkDescription():
         p = self.checkPhotos()
-        q, description = self.checkDescription()
-        r = self.findFace(description)
+        q = self.checkDescription()
+        r = self.findFace(i)
         # photoElement = self.driver.find_element_by_xpath('/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[1]/div[1]/div/div[4]/div/div')
         # photoElement = wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[1]/div[1]/div/div[1]/div/div')))
         # photoPath = photoElement.get_attribute("src")
@@ -229,7 +244,7 @@ class TinderBot():
         # zamkniecie opisu
         exitDescription = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[20])))
         exitDescription.click()
-        return profileOk, description
+        return profileOk
 
 
     # proba znalezienia trzeciego zdjecia, jesli nie ma -> swipe left
@@ -242,44 +257,57 @@ class TinderBot():
             return False
 
 
-    def findFace(self, description):
-
+    def findFace(self, i):
+        flag = False
         wait = WebDriverWait(self.driver, 5)
-        self.driver.get_screenshot_as_file('screenshot.png')
-        img = cv2.imread('screenshot.png')
-        # face_cascade = cv2.CascadeClassifier(r'C:\Users\User\PycharmProjects\tinderbot\venv\Lib\site-packages\cv2\data\haarcascade_frontalface_default.xml')
-        face_cascade = cv2.CascadeClassifier(faceLibraryPath)
-        print(face_cascade)
-        crop_img = img[400:530, 900:1000]
-        cv2.imwrite("cropp.png", crop_img)
-        img1 = cv2.imread('cropp.png')
-        photoGray = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
+        
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+            
+        self.driver.get_screenshot_as_file('screenshot' + str(i) + '.png')
+        img.append(cv2.imread('screenshot' + str(i) + '.png'))
+        face_cascade = cv2.CascadeClassifier(
+            r'C:\Users\User\PycharmProjects\tinderbot\venv\Lib\site-packages\cv2\data\haarcascade_frontalface_default.xml'
+        )
 
-        cv2.imshow("cropped", photoGray)
-        faces = face_cascade.detectMultiScale(
-            photoGray,
+        crop_img.append(img[i][100:230, 1000:1300])
+        
+        cv2.imwrite("cropp" + str(i) + ".png", crop_img[i])
+        img1.append(cv2.imread('cropp' + str(i) + '.png'))
+        photoGray.append(cv2.cvtColor(img1[i], cv2.COLOR_BGR2GRAY))
+        faces.append(face_cascade.detectMultiScale(
+            photoGray[i],
             scaleFactor=1.1,
             minNeighbors=5,
             minSize=(30, 30),
             flags=cv2.CASCADE_SCALE_IMAGE
-        )
+        ))
 
-        # szukamy twarzy
-        # nie znaleziono twarzy
-        if (len(faces) == 0):
-            print("no face found")
-            # directory = 'C:/Users/User/Pictures/tinder_faces'
-            # if not os.path.exists(directory):
-            if not os.path.exists(savePicturesDirectory):
-                os.makedirs(savePicturesDirectory)
-            cv2.imwrite(savePicturesDirectory + '/' + description + ".png", img1)
-            return False
+        if (x == 0):
+            print("no face detected")
+            cv2.imwrite(savePicturesDirectory + str(i) + ".png", img1[i])
         else:
-            return True
+            detector = FER()
+            emotion, score = detector.top_emotion(img1[i])
+            print(emotion, score)
+            
+            if (emotion == 'angry' or emotion == 'sad') and score > 0.9:
+                print('too angry for me')
+                cv2.imwrite(savePicturesDirectory + str(i) + ".png", img1[i])
+
+            else:
+                print('Perfect')
+                flag = True
+        return flag
 
 
 bot = TinderBot()
 bot.launchTinder()
-for a in range(0, 15):
-    bot.swipe()
+img1 = []
+photoGray = []
+crop_img = []
+img = []
+faces = []
+for i in range(0, 15):
+    bot.swipe(i)
     bot.chat()
