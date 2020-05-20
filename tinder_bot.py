@@ -23,9 +23,6 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = './diana-eoqlsq-98249f138627.json
 SESSION_ID = '118197476799899566966'
 
 
-# server.login(email,password)
-
-
 class TinderBot():
     keywords: []
     keywordsVerification: []
@@ -154,7 +151,11 @@ class TinderBot():
 
 
     def send_mail(self, name_of_guy):
-
+        server.connect('smtp.gmail.com', 587)
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login(email, password)
         message = MIMEText("You've got a new date invitation from", name_of_guy)
         message["From"] = email
         message["To"] = email
