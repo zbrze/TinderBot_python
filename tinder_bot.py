@@ -21,7 +21,7 @@ DIALOGFLOW_PROJECT_ID = 'diana-eoqlsq'
 DIALOGFLOW_LANGUAGE_CODE = 'pl'
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = './diana-eoqlsq-98249f138627.json'
 SESSION_ID = '118197476799899566966'
-directory = 'C:/Users/User/Pictures/tinder_faces/'
+
 
 # server.login(email,password)
 
@@ -37,7 +37,8 @@ class TinderBot():
         options.add_argument("--start-maximized")
         self.driver = webdriver.Chrome(chrome_options=options)
         self.keywordsVerificationKey = []
-        with open("keywords", "r") as keywordsFile, open("keywordsVerification", "r") as keywordsVerificationFile, codecs.open("paths", "r", "utf-8") as pathsFile:
+        with open("keywords", "r") as keywordsFile, open("keywordsVerification", "r") as keywordsVerificationFile,\
+                codecs.open("paths", "r", "utf-8") as pathsFile:
             self.keywords = keywordsFile.readlines()
             self.keywordsVerification = keywordsVerificationFile.readlines()
             for i in range(0, len(self.keywordsVerification)):
@@ -63,28 +64,13 @@ class TinderBot():
         self.driver.get('https://tinder.com/')
         wait = WebDriverWait(self.driver, 5)
 
-        # przyciskow szukamy zawsze w bloku try zeby nie wyrzucalo bledu jak nie znajdzie bo nie zawsze znaczy to ze trzeba przerwac program
+        # przyciskow szukamy zawsze w bloku try zeby nie wyrzucalo bledu
+        # jak nie znajdzie bo nie zawsze znaczy to ze trzeba przerwac program
 
         # 0 -> privacyButton, 1 -> moreOptions, 2 -> loginByFB
-
         buttons = []
-        # try:
-        #     # for i in range(0, 3):
-        #     #     print(i)
-        #     #     buttons[i] = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[i])))
-        #     #     buttons[i].click()
-        #     privacyButton = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[0])))
-        #     privacyButton.click()
-        #     moreOptions = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[1])))
-        #     moreOptions.click()
-        #     loginByFB = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[2])))
-        #     loginByFB.click()
-        # except:
-        #         pass
-
         for i in range(0, 3):
             try:
-                print(self.paths[i])
                 buttons.append(wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[i]))))
                 buttons[len(buttons) - 1].click()
             except:
@@ -105,8 +91,8 @@ class TinderBot():
         # 6 -> localizationButton, 7 -> noNotificationsButton, 8 -> cookiesButton, 9 -> noLocalizationChangeButton
         for i in range(6, 10):
             try:
-                button = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[i])))
-                button.click()
+                buttons.append(wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[i]))))
+                buttons[len(buttons) - 1].click()
             except:
                 pass
 
@@ -260,18 +246,16 @@ class TinderBot():
     def findFace(self, i):
         flag = False
         wait = WebDriverWait(self.driver, 5)
-        
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-            
+
+        if not os.path.exists(savePicturesDirectory):
+            os.makedirs(savePicturesDirectory)
+
         self.driver.get_screenshot_as_file('screenshot' + str(i) + '.png')
         img.append(cv2.imread('screenshot' + str(i) + '.png'))
-        face_cascade = cv2.CascadeClassifier(
-            r'C:\Users\User\PycharmProjects\tinderbot\venv\Lib\site-packages\cv2\data\haarcascade_frontalface_default.xml'
-        )
+        face_cascade = cv2.CascadeClassifier(faceLibraryPath)
 
         crop_img.append(img[i][100:230, 1000:1300])
-        
+
         cv2.imwrite("cropp" + str(i) + ".png", crop_img[i])
         img1.append(cv2.imread('cropp' + str(i) + '.png'))
         photoGray.append(cv2.cvtColor(img1[i], cv2.COLOR_BGR2GRAY))
@@ -290,7 +274,7 @@ class TinderBot():
             detector = FER()
             emotion, score = detector.top_emotion(img1[i])
             print(emotion, score)
-            
+
             if (emotion == 'angry' or emotion == 'sad') and score > 0.9:
                 print('too angry for me')
                 cv2.imwrite(savePicturesDirectory + str(i) + ".png", img1[i])
