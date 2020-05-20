@@ -96,27 +96,24 @@ class TinderBot():
     def swipe(self, i):
         wait = WebDriverWait(self.driver, 5)
 
-        # if self.checkPhotos() and self.checkDescription():
         p = self.checkPhotos()
         q = self.checkDescription()
         r = self.findFace(i)
-        # photoElement = self.driver.find_element_by_xpath('/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[1]/div[1]/div/div[4]/div/div')
-        # photoElement = wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[1]/div[1]/div/div[1]/div/div')))
-        # photoPath = photoElement.get_attribute("src")
-        # r = self.findFace(photoPath)
 
-        # if p and q and r:
-        if p and q:
-            swipeRightButton = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[10])))
-            swipeRightButton.click()
-        else:
-            continueSwiping = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[12])))
-            continueSwiping.click()
+        try:
+            if p and q and r:
+                swipeRightButton = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[10])))
+                swipeRightButton.click()
+            else:
+                swipeLeft = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[12])))
+                swipeLeft.click()
+        except:
+            pass
 
         # zamkniecie ewentualnego powiadomienia o nowym matchu
         try:
             continueSwiping = wait.until(
-                EC.element_to_be_clickable((By.XPATH, '//*[@id="modal-manager-canvas"]/div/div/div[1]/div/div[3]/a')))
+                EC.element_to_be_clickable((By.XPATH, self.paths[11])))
             continueSwiping.click()
         except:
             pass
@@ -127,7 +124,6 @@ class TinderBot():
             dontAddShortcut.click()
         except:
             pass
-
 
     def chat_bot(self, xd, name_of_guy):
 
@@ -148,7 +144,6 @@ class TinderBot():
             return response.query_result.fulfillment_text
         else:
             return ':)'
-
 
     def send_mail(self, name_of_guy):
         server.connect('smtp.gmail.com', 587)
@@ -199,6 +194,8 @@ class TinderBot():
             except:
                 pass
 
+    # sprawdzenie czy opis zawiera slowa kluczowe ktorych nie chcemy
+    # i potem sprawdzenie czy ewentulanie wystepuja w zlozeniach z innymi slowami, tak ze juz akceptujemy
     def checkDescription(self):
         wait = WebDriverWait(self.driver, 5)
         profileOk = True
@@ -243,10 +240,8 @@ class TinderBot():
         except:
             return False
 
-
     def findFace(self, i):
         flag = False
-        wait = WebDriverWait(self.driver, 5)
 
         if not os.path.exists(savePicturesDirectory):
             os.makedirs(savePicturesDirectory)
@@ -255,7 +250,7 @@ class TinderBot():
         img.append(cv2.imread('screenshot' + str(i) + '.png'))
         face_cascade = cv2.CascadeClassifier(faceLibraryPath)
 
-        crop_img.append(img[i][100:230, 1000:1300])
+        crop_img.append(img[i][100:650, 1000:1300])
 
         cv2.imwrite("cropp" + str(i) + ".png", crop_img[i])
         img1.append(cv2.imread('cropp' + str(i) + '.png'))
@@ -268,7 +263,7 @@ class TinderBot():
             flags=cv2.CASCADE_SCALE_IMAGE
         ))
         x = len(faces[i])
-        if (x == 0):
+        if x == 0:
             print("no face detected")
             cv2.imwrite(savePicturesDirectory + str(i) + ".png", img1[i])
         else:
@@ -293,6 +288,7 @@ photoGray = []
 crop_img = []
 img = []
 faces = []
-for i in range(0, 15):
-    bot.swipe(i)
-    bot.chat()
+for index in range(0, 5):
+    bot.swipe(index)
+
+bot.chat()
