@@ -16,6 +16,8 @@ import dialogflow
 import os
 from fer import FER
 from loginInfo import email, password, faceLibraryPath, savePicturesDirectory
+
+
 server = smtplib.SMTP('smtp.gmail.com', 587)
 DIALOGFLOW_PROJECT_ID = 'diana-eoqlsq'
 DIALOGFLOW_LANGUAGE_CODE = 'pl'
@@ -124,12 +126,12 @@ class TinderBot():
         except:
             pass
 
-    def chat_bot(self, xd, name_of_guy):
+    def chat_bot(self, txt, name_of_guy):
 
         session_client = dialogflow.SessionsClient()
         session = session_client.session_path(DIALOGFLOW_PROJECT_ID, SESSION_ID)
-        text_input = dialogflow.types.TextInput(text=xd, language_code=DIALOGFLOW_LANGUAGE_CODE)
-        query_input = dialogflow.types.QueryInput(text=text_input)
+        text_input = dialogflow.types.TextInput(text = txt, language_code=DIALOGFLOW_LANGUAGE_CODE)
+        query_input = dialogflow.types.QueryInput(text = text_input)
         response = session_client.detect_intent(session=session, query_input=query_input)
         # sprawdzanie czy intent jest typu propozycja spotkania
 
@@ -145,6 +147,7 @@ class TinderBot():
             return ':)'
 
     def send_mail(self, name_of_guy):
+        
         server.connect('smtp.gmail.com', 587)
         server.ehlo()
         server.starttls()
@@ -158,7 +161,9 @@ class TinderBot():
         server.sendmail(email, email, message.as_string())
 
 
+        
     def chat(self):
+        
         wait = WebDriverWait(self.driver, 5)
         try:
             messagesButton = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[14])))
@@ -169,8 +174,9 @@ class TinderBot():
         sleep(2)
         # chat_windows = wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'messageListItem')))
         chat_windows = self.driver.find_elements_by_class_name('messageListItem')
-
+        
         counter = 0
+        #ograniczamy liczbę wiadomości na które odpowiadamy
         for convo in chat_windows:
             if counter == 5:
                 return
@@ -184,6 +190,7 @@ class TinderBot():
             print(str(last_message))
             # teraz sprawdzamy czy ostatnia wiadomość na czacie została napisana przez nas czy przez parę -
             # wiadomości napisane przez parę mają kolor #000
+            
             if "C(#000)" in last_message.get_attribute('class').split():
                 # Message might not have text, just emoji.
                 last_message_text = last_message.find_element_by_xpath(".//span").text
@@ -249,22 +256,27 @@ class TinderBot():
             return True
         except:
             return False
+        
+        
 
     def findFace(self, i):
         flag = False
-
+        #tworzymy folder na zdjęcia
         if not os.path.exists(savePicturesDirectory):
             os.makedirs(savePicturesDirectory)
 
         self.driver.get_screenshot_as_file('screenshot' + str(i) + '.png')
         img.append(cv2.imread('screenshot' + str(i) + '.png'))
+        
         face_cascade = cv2.CascadeClassifier(faceLibraryPath)
 
+        #wycinamy część zdjęcia, żeby nie szukać twarzy na zdjęciach już sparowanych 
         crop_img.append(img[i][100:650, 1000:1300])
 
         cv2.imwrite("cropp" + str(i) + ".png", crop_img[i])
         img1.append(cv2.imread('cropp' + str(i) + '.png'))
         photoGray.append(cv2.cvtColor(img1[i], cv2.COLOR_BGR2GRAY))
+        
         faces.append(face_cascade.detectMultiScale(
             photoGray[i],
             scaleFactor=1.1,
@@ -272,9 +284,11 @@ class TinderBot():
             minSize=(30, 30),
             flags=cv2.CASCADE_SCALE_IMAGE
         ))
+        
         x = len(faces[i])
         if x == 0:
             print("no face detected")
+            #jeśli nie znajdziemy twarzy na zdjęciu, zapisujemy je w folderze
             cv2.imwrite(savePicturesDirectory + str(i) + ".png", img1[i])
         else:
             detector = FER()
@@ -291,6 +305,8 @@ class TinderBot():
         return flag
 
 
+    
+    
 bot = TinderBot()
 bot.launchTinder()
 img1 = []
@@ -298,6 +314,7 @@ photoGray = []
 crop_img = []
 img = []
 faces = []
+
 for index in range(0, 5):
     bot.swipe(index)
 
