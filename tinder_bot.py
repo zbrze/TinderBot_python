@@ -32,14 +32,17 @@ class TinderBot():
     paths: []
 
     def __init__(self):
+        
         options = webdriver.ChromeOptions()
         options.add_argument("--start-maximized")
         self.driver = webdriver.Chrome(chrome_options=options)
         self.keywordsVerificationKey = []
+        
         with open("keywords", "r") as keywordsFile, open("keywordsVerification", "r") as keywordsVerificationFile,\
                 codecs.open("paths", "r", "utf-8") as pathsFile:
             self.keywords = keywordsFile.readlines()
             self.keywordsVerification = keywordsVerificationFile.readlines()
+            
             for i in range(0, len(self.keywordsVerification)):
                 # usuniecie znaku konca linii
                 tmp = re.split("\n", self.keywordsVerification[i])
