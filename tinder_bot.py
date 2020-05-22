@@ -1,12 +1,16 @@
 import codecs
+
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 import re
+import time
 import smtplib
 from email.mime.text import MIMEText
 import cv2
+import sys
+from io import BytesIO
 from time import sleep
 import dialogflow
 import os
@@ -26,14 +30,17 @@ class TinderBot:
     paths: []
 
     def __init__(self):
+
         options = webdriver.ChromeOptions()
         options.add_argument("--start-maximized")
         self.driver = webdriver.Chrome(chrome_options=options)
         self.keywordsVerificationKey = []
+
         with open("keywords", "r") as keywordsFile, open("keywordsVerification", "r") as keywordsVerificationFile,\
                 codecs.open("paths", "r", "utf-8") as pathsFile:
             self.keywords = keywordsFile.readlines()
             self.keywordsVerification = keywordsVerificationFile.readlines()
+
             for i in range(0, len(self.keywordsVerification)):
                 # usuniecie znaku konca linii
                 tmp = re.split("\n", self.keywordsVerification[i])
@@ -124,11 +131,12 @@ class TinderBot:
         except:
             pass
 
-    def chat_bot(self, xd, name_of_guy):
+    def chat_bot(self, txt, name_of_guy):
+
         session_client = dialogflow.SessionsClient()
         session = session_client.session_path(DIALOGFLOW_PROJECT_ID, SESSION_ID)
-        text_input = dialogflow.types.TextInput(text=xd, language_code=DIALOGFLOW_LANGUAGE_CODE)
-        query_input = dialogflow.types.QueryInput(text=text_input)
+        text_input = dialogflow.types.TextInput(text = txt, language_code=DIALOGFLOW_LANGUAGE_CODE)
+        query_input = dialogflow.types.QueryInput(text = text_input)
         response = session_client.detect_intent(session=session, query_input=query_input)
 
         # sprawdzanie czy intent jest typu propozycja spotkania
@@ -144,6 +152,7 @@ class TinderBot:
             return ':)'
 
     def send_mail(self, name_of_guy):
+
         server.connect('smtp.gmail.com', 587)
         server.ehlo()
         server.starttls()
@@ -157,6 +166,7 @@ class TinderBot:
         server.sendmail(email, email, message.as_string())
 
     def chat(self):
+
         wait = WebDriverWait(self.driver, 5)
         try:
             messagesButton = wait.until(EC.element_to_be_clickable((By.XPATH, self.paths[14])))
@@ -168,9 +178,9 @@ class TinderBot:
         chat_windows = self.driver.find_elements_by_class_name('messageListItem')
 
         counter = 0
+        #ograniczamy liczbę wiadomości na które odpowiadamy
         for convo in chat_windows:
-            # powrot po odpisaniu trzem osobom bo normalnie leci do konca listy chatow
-            if counter == 3:
+            if counter == 5:
                 return
             counter += 1
             convo.click()
@@ -178,6 +188,7 @@ class TinderBot:
             all_messages = self.driver.find_elements_by_class_name('msg')
             last_message = all_messages[-1]
             print(str(last_message))
+
             # teraz sprawdzamy czy ostatnia wiadomość na czacie została napisana przez nas czy przez parę -
             # wiadomości napisane przez parę mają kolor #000
             if "C(#000)" in last_message.get_attribute('class').split():
@@ -240,6 +251,7 @@ class TinderBot:
         # zwracamy flage, a wiec czy profil jest odpowiedni
         return profileOk
 
+
     # proba znalezienia trzeciego zdjecia, jesli nie ma -> swipe left
     # ilosc zdjec mozna zmieniac po prostu zmieniajac xpath bo sa przyciski do kazdego zdjecia
     # (do zmiany powinna wystarczyc wartosc w ostatnim nawiasie kwadratowym xpathu)
@@ -261,15 +273,17 @@ class TinderBot:
         # zrobienie screenshota
         self.driver.get_screenshot_as_file('screenshot' + str(i) + '.png')
         img.append(cv2.imread('screenshot' + str(i) + '.png'))
+
         face_cascade = cv2.CascadeClassifier(faceLibraryPath)
 
-        # przyciecie zdjecia
+        #wycinamy część zdjęcia, żeby nie szukać twarzy na zdjęciach już sparowanych
         crop_img.append(img[i][100:650, 1000:1300])
         # zapisanie przycietego
         cv2.imwrite("cropp" + str(i) + ".png", crop_img[i])
         # szukanie twarzy
         img1.append(cv2.imread('cropp' + str(i) + '.png'))
         photoGray.append(cv2.cvtColor(img1[i], cv2.COLOR_BGR2GRAY))
+
         faces.append(face_cascade.detectMultiScale(
             photoGray[i],
             scaleFactor=1.1,
@@ -277,9 +291,11 @@ class TinderBot:
             minSize=(30, 30),
             flags=cv2.CASCADE_SCALE_IMAGE
         ))
+
         x = len(faces[i])
         if x == 0:
             print("no face detected")
+            #jeśli nie znajdziemy twarzy na zdjęciu, zapisujemy je w folderze
             cv2.imwrite(savePicturesDirectory + str(i) + ".png", img1[i])
         else:
             # jesli znaleziono twarz to szukamy emocji
@@ -297,6 +313,8 @@ class TinderBot:
         return flag
 
 
+
+
 bot = TinderBot()
 bot.launchTinder()
 img1 = []
@@ -305,8 +323,8 @@ crop_img = []
 img = []
 faces = []
 
-# przesunie 3 osob w ktoras strone
-for index in range(0, 3):
+# przesunie 5 osob w ktoras strone
+for index in range(0, 5):
     bot.swipe(index)
-# odpisywanie ludziom (w funkcji char jest ustawiony powrot po trzech osobach)
+# odpisywanie ludziom (w funkcji chat jest ustawiony powrot po trzech osobach)
 bot.chat()
